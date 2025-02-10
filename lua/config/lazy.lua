@@ -236,6 +236,25 @@ require("lazy").setup({
             ---@type render.md.UserConfig
             opts = {},
         },
+        {
+            'tanvirtin/vgit.nvim',
+            dependencies = { 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' },
+            -- Lazy loading on 'VimEnter' event is necessary.
+            event = 'VimEnter',
+            config = function() 
+                require("vgit").setup({
+                    keymaps = {
+                        ['n <C-p>'] = require('vgit').hunk_up,
+                        ['n <C-n>'] = require('vgit').hunk_down,
+                        ['n <leader>gb'] = require('vgit').buffer_blame_preview,
+                        ['n <leader>gd'] = require('vgit').buffer_diff_preview,
+                        ['n <leader>gh'] = require('vgit').buffer_history_preview,
+                        ['n <leader>gpd'] = require('vgit').project_diff_preview,
+                        ['n <leader>gph'] = require('vgit').project_history_preview,
+                    },
+                }) 
+            end,
+        }
     },
     -- automatically check for plugin updates
     checker = { enabled = false },
