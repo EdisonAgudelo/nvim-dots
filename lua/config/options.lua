@@ -24,3 +24,8 @@ vim.g.mapleader = " "
 
 vim.keymap.set("n", "<A-n>", ":cnext<CR>")
 vim.keymap.set("n", "<A-p>", ":cprev<CR>")
+vim.keymap.set("n", "<leader><Tab>", ":tabn<CR>")
+vim.keymap.set("n", "<s-leader><Tab>", ":tabp<CR>")
+vim.keymap.set("n", "<leader>n", ":bn<CR>")
+vim.keymap.set("n", "<leader>p", ":bp<CR>")
+vim.keymap.set("n", "<leader>q", ":bdelete<CR>")

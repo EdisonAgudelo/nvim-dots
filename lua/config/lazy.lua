@@ -42,7 +42,7 @@ require("lazy").setup({
         {
             "nvim-treesitter/nvim-treesitter",
             build = ":TSUpdate",
-            
+
             config = function()
 
                 require("nvim-treesitter.configs").setup({
@@ -197,10 +197,10 @@ require("lazy").setup({
             "nvim-telescope/telescope.nvim",  branch = "0.1.x",
             dependencies = { "nvim-lua/plenary.nvim" },
             keys = {
-                 "<leader>ff",
-                 "<leader>fg",
-                 "<leader>fb",
-                 "<leader>fh",
+                "<leader>ff",
+                "<leader>fg",
+                "<leader>fb",
+                "<leader>fh",
             },
             cmd = "Telescope",
             config = function ()
@@ -254,7 +254,34 @@ require("lazy").setup({
                     },
                 }) 
             end,
-        }
+        },
+        { 
+            'echasnovski/mini.statusline', 
+            version = '*' ,
+            config = function ()
+                require("mini.statusline").setup({
+                    set_vim_settings = true
+                })
+            end
+        },
+        {
+            'akinsho/bufferline.nvim',
+            version = "*", 
+            dependencies = 'nvim-tree/nvim-web-devicons',
+            config = function ()
+                require("bufferline").setup({
+                    options={
+                        numbers = "buffer_id",
+                        offsets = {
+                            {
+                                filetype = "NvimTree",
+                                separator = true
+                            }
+                        },
+                    }
+                })
+            end
+        },
     },
     -- automatically check for plugin updates
     checker = { enabled = false },
