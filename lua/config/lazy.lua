@@ -45,12 +45,12 @@ require("lazy").setup({
             build = ":TSUpdate",
 
             config = function()
-
+                require("nvim-treesitter.install").compilers = { "clang" }
                 require("nvim-treesitter.configs").setup({
                     modules = {},
                     ignore_install = {},
 
-                    ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "python"},
+                    ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "python", "markdown"},
                     sync_install = false,
                     auto_install = true,
 
@@ -202,9 +202,9 @@ require("lazy").setup({
                     default = { "lsp", "path", "snippets", "buffer" , "markdown" },
                     providers = {
                         markdown = {
-                            name = 'RenderMarkdown',
-                            module = 'render-markdown.integ.blink',
-                            fallbacks = { 'lsp' },
+                            name = "RenderMarkdown",
+                            module = "render-markdown.integ.blink",
+                            fallbacks = { "lsp" },
                         },
                     },
                 },
@@ -335,7 +335,7 @@ require("lazy").setup({
         {
             "lewis6991/gitsigns.nvim",
             config = function ()
-                require('gitsigns').setup()
+                require("gitsigns").setup()
             end,
         }
     },
