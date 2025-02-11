@@ -31,6 +31,7 @@ require("lazy").setup({
         -- import plugins
         {
             -- Color scheme 
+            -- -- get rid of vim symbol not defined
             "folke/tokyonight.nvim",
             lazy = false, -- make sure we load this during startup if it is your main colorscheme
             priority = 1000, -- make sure to load this before all the other start plugins
@@ -46,6 +47,9 @@ require("lazy").setup({
             config = function()
 
                 require("nvim-treesitter.configs").setup({
+                    modules = {},
+                    ignore_install = {},
+
                     ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "python"},
                     sync_install = false,
                     auto_install = true,
@@ -128,20 +132,47 @@ require("lazy").setup({
             dependecies = {"nvim-lspconfig", "saghen/blink.cmp"},
             config = function()
                 local capabilities = require("blink.cmp").get_lsp_capabilities()
+                local custom_settings = {
+                    ["clangd"] = {
+                        capabilities = capabilities,
+                        -- do not auto include files
+                        cmd = { "clangd", "-header-insertion=never" }
+                    },
+                    ["lua_ls"] = {
+                        capabilities = capabilities,
+                        -- get rid of vim symbol not defined
+                        settings = {
+                            Lua = {
+                                runtime = {
+                                    version = "LuaJIT",
+                                },
+                                diagnostics = {
+                                    -- Get the language server to recognize the `vim` global
+                                    globals = { "vim" },
+                                },
+                                workspace = {
+                                    -- Make the server aware of Neovim runtime files
+                                    library = vim.api.nvim_get_runtime_file("", true),
+                                },
+                                telemetry = {
+                                    enable = false,
+                                },
+                            },
+                        },
+                    }
+                }
                 require("mason-lspconfig").setup()
                 require("mason-lspconfig").setup_handlers({
                     function(server_name)
-                        -- do not auto include files
-                        if server_name == "clangd" then
-                            require("lspconfig")[server_name].setup({
+                        local settings = custom_settings[server_name]
+                        if not settings then
+                            settings = {
                                 capabilities = capabilities,
-                                cmd = { "clangd", "-header-insertion=never" }
-                            })
-                        else
-                            require("lspconfig")[server_name].setup({
-                                capabilities = capabilities
-                            })
+                            }
                         end
+                        require("lspconfig")[server_name].setup(
+                            settings
+                        )
                     end,
                 })
             end,
@@ -156,19 +187,26 @@ require("lazy").setup({
             ---@module "blink.cmp"
             ---@type blink.cmp.Config
             opts = {
-                keymap = { 
+                keymap = {
                     preset = "default",
-                    ['<Tab>'] = {
+                    ["<Tab>"] = {
                         function(cmp)
                             if cmp.snippet_active() then return cmp.accept()
                             else return cmp.select_and_accept() end
                         end,
-                        'snippet_forward',
-                        'fallback'
+                        "snippet_forward",
+                        "fallback"
                     },
                 },
                 sources = {
-                    default = { "lsp", "path", "snippets", "buffer" },
+                    default = { "lsp", "path", "snippets", "buffer" , "markdown" },
+                    providers = {
+                        markdown = {
+                            name = 'RenderMarkdown',
+                            module = 'render-markdown.integ.blink',
+                            fallbacks = { 'lsp' },
+                        },
+                    },
                 },
                 completion = {
                     menu = {
@@ -228,36 +266,18 @@ require("lazy").setup({
             end,
         },
         {
-            'MeanderingProgrammer/render-markdown.nvim',
+            "MeanderingProgrammer/render-markdown.nvim",
             lazy = true,
             ft = "markdown",
-            dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim', 'nvim-tree/nvim-web-devicons' },
-            ---@module 'render-markdown'
+            dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+            ---@module "render-markdown"
             ---@type render.md.UserConfig
             opts = {},
         },
         {
-            'tanvirtin/vgit.nvim',
-            dependencies = { 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' },
-            -- Lazy loading on 'VimEnter' event is necessary.
-            event = 'VimEnter',
-            config = function() 
-                require("vgit").setup({
-                    keymaps = {
-                        ['n <C-p>'] = require('vgit').hunk_up,
-                        ['n <C-n>'] = require('vgit').hunk_down,
-                        ['n <leader>gb'] = require('vgit').buffer_blame_preview,
-                        ['n <leader>gd'] = require('vgit').buffer_diff_preview,
-                        ['n <leader>gh'] = require('vgit').buffer_history_preview,
-                        ['n <leader>gpd'] = require('vgit').project_diff_preview,
-                        ['n <leader>gph'] = require('vgit').project_history_preview,
-                    },
-                }) 
-            end,
-        },
-        { 
-            'echasnovski/mini.statusline', 
-            version = '*' ,
+            -- colored statuls line, quyte simple
+            "echasnovski/mini.statusline",
+            version = "*" ,
             config = function ()
                 require("mini.statusline").setup({
                     set_vim_settings = true
@@ -265,9 +285,10 @@ require("lazy").setup({
             end
         },
         {
-            'akinsho/bufferline.nvim',
-            version = "*", 
-            dependencies = 'nvim-tree/nvim-web-devicons',
+            -- for buffer "tabs"
+            "akinsho/bufferline.nvim",
+            version = "*",
+            dependencies = "nvim-tree/nvim-web-devicons",
             config = function ()
                 require("bufferline").setup({
                     options={
@@ -282,6 +303,41 @@ require("lazy").setup({
                 })
             end
         },
+        -- {
+        --     already in nvim core
+        --     "echasnovski/mini.comment",
+        --     version = "*",
+        --     config = function ()
+        --         require("mini.comment").setup()
+        --     end,
+        -- },
+        {
+            "tpope/vim-surround"
+        },
+        {
+            "kdheepak/lazygit.nvim",
+            lazy = true,
+            cmd = {
+                "LazyGit",
+                "LazyGitConfig",
+                "LazyGitCurrentFile",
+                "LazyGitFilter",
+                "LazyGitFilterCurrentFile",
+            },
+            -- optional for floating window border decoration
+            dependencies = {
+                "nvim-lua/plenary.nvim",
+            },
+            keys = {
+                { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+            }
+        },
+        {
+            "lewis6991/gitsigns.nvim",
+            config = function ()
+                require('gitsigns').setup()
+            end,
+        }
     },
     -- automatically check for plugin updates
     checker = { enabled = false },
