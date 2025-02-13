@@ -215,7 +215,7 @@ require("lazy").setup({
                         end,
                     },
                     list = {
-                        selection = {auto_insert = false, preselect = true}
+                        selection = {auto_insert = true, preselect = false}
                     },
                     trigger = {
                         show_on_keyword = true
@@ -236,7 +236,13 @@ require("lazy").setup({
             cmd = {
                 "PIO",
                 "PIOInit"
+            },
+            keys = {
+                { "<leader>ii", "<cmd>PIOInit<cr>", desc = "Init or update build information PIO project" },
+                { "<leader>iu", "<cmd>make upload<cr>", desc = "Build and upload PIO project" },
+                { "<leader>ic", "<cmd>make clean<cr>", desc = "Clean build PIO project" }
             }
+
         },
         {
             "nvim-telescope/telescope.nvim",  branch = "0.1.x",
@@ -284,7 +290,7 @@ require("lazy").setup({
         {
             "jghauser/follow-md-links.nvim",
             config = function()
-                vim.keymap.set('n', '<bs>', ':edit #<cr>', { silent = true })
+                vim.keymap.set("n", "<bs>", ":edit #<cr>", { silent = true })
             end,
         },
         {
@@ -312,8 +318,11 @@ require("lazy").setup({
                                 separator = true
                             }
                         },
+                        close_command = "silent! bdelete %d",       -- can be a string | function, | false see "Mouse actions"
                     }
                 })
+                vim.keymap.set("n", "<leader>qo", "<cmd>BufferLineCloseOthers<CR>", {desc = "Close all but buffer"})
+                vim.keymap.set("n", "<leader>qq", "<cmd>bdelete<CR>", {desc = "Close current buffer"})
             end
         },
         -- {
