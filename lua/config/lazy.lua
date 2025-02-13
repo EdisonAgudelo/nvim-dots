@@ -45,7 +45,7 @@ require("lazy").setup({
             build = ":TSUpdate",
 
             config = function()
-                require("nvim-treesitter.install").compilers = { "clang" }
+                require("nvim-treesitter.install").compilers = { "clang", "gcc" }
                 require("nvim-treesitter.configs").setup({
                     modules = {},
                     ignore_install = {},
@@ -115,9 +115,9 @@ require("lazy").setup({
         {
             "neovim/nvim-lspconfig",
             keys = {
-                {"gD", "<cmd>lua vim.lsp.buf.declaration()<CR>",  "Goto Declaration"},
-                {"gd", "<cmd>lua vim.lsp.buf.definition()<CR>",  "Goto Definition"},
-                {"gr", "<cmd>lua vim.lsp.buf.references()<CR>",  "Show References"},
+                {"gD", "<cmd>lua vim.lsp.buf.declaration()<CR>",  desc = "Goto Declaration"},
+                {"gd", "<cmd>lua vim.lsp.buf.definition()<CR>",  desc = "Goto Definition"},
+                {"gr", "<cmd>lua vim.lsp.buf.references()<CR>",  desc = "Show References"},
             },
         },
         {
@@ -214,8 +214,15 @@ require("lazy").setup({
                             return ctx.mode ~= "cmdline" or not vim.tbl_contains({ "/", "?" }, vim.fn.getcmdtype())
                         end,
                     },
+                    list = {
+                        selection = {auto_insert = false, preselect = true}
+                    },
+                    trigger = {
+                        show_on_keyword = true
+                    },
                     documentation = { auto_show = true, auto_show_delay_ms = 500 },
                     ghost_text = { enabled = true },
+
                 },
                 signature = { enabled = true }
 
@@ -235,10 +242,10 @@ require("lazy").setup({
             "nvim-telescope/telescope.nvim",  branch = "0.1.x",
             dependencies = { "nvim-lua/plenary.nvim" },
             keys = {
-                "<leader>ff",
-                "<leader>fg",
-                "<leader>fb",
-                "<leader>fh",
+                {"<leader>ff", desc = "Find file"},
+                {"<leader>fg", desc = "Find in files"},
+                {"<leader>fb", desc = "Find in buffer"},
+                {"<leader>fh", desc = "Find help"},
             },
             cmd = "Telescope",
             config = function ()
@@ -273,6 +280,12 @@ require("lazy").setup({
             ---@module "render-markdown"
             ---@type render.md.UserConfig
             opts = {},
+        },
+        {
+            "jghauser/follow-md-links.nvim",
+            config = function()
+                vim.keymap.set('n', '<bs>', ':edit #<cr>', { silent = true })
+            end,
         },
         {
             -- colored statuls line, quyte simple
@@ -337,6 +350,41 @@ require("lazy").setup({
             config = function ()
                 require("gitsigns").setup()
             end,
+        },
+        {
+            "folke/which-key.nvim",
+            event = "VeryLazy",
+            opts = {
+                preset = "modern",
+                delay = 500
+            },
+            keys = {
+                {
+                    "<leader>?",
+                    function()
+                        require("which-key").show({ global = false })
+                    end,
+                    desc = "Buffer Local Keymaps (which-key)",
+                },
+            },
+        },
+        {
+            "folke/trouble.nvim",
+            opts = {},
+            cmd = "Trouble",
+            keys = {
+                {
+                    "<leader>xx",
+                    "<cmd>Trouble diagnostics toggle<cr>",
+                    desc = "Diagnostics (Trouble)",
+                },
+            },
+        },
+        {
+            "iamcco/markdown-preview.nvim",
+            cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+            ft = { "markdown" },
+            build = ":call mkdp#util#install()",
         }
     },
     -- automatically check for plugin updates
