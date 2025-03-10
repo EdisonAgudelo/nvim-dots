@@ -133,6 +133,18 @@ require("lazy").setup({
             config = function()
                 local capabilities = require("blink.cmp").get_lsp_capabilities()
                 local custom_settings = {
+                    ["pylsp"] = {
+                        capabilities = capabilities,
+                        settings = {
+                            pylsp = {
+                                plugins = {
+                                    pycodestyle = {
+                                        enabled = false,
+                                    }
+                                }
+                            }
+                        }
+                    },
                     ["clangd"] = {
                         capabilities = capabilities,
                         -- do not auto include files
@@ -394,7 +406,23 @@ require("lazy").setup({
             cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
             ft = { "markdown" },
             build = ":call mkdp#util#install()",
-        }
+        },
+        {
+            'linux-cultist/venv-selector.nvim',
+            dependencies = { 'neovim/nvim-lspconfig', 'nvim-telescope/telescope.nvim'},
+            opts = {
+                -- Your options go here
+                -- name = "venv",
+                -- auto_refresh = false
+            },
+            event = 'VeryLazy', -- Optional: needed only if you want to type `:VenvSelect` without a keymapping
+            keys = {
+                -- Keymap to open VenvSelector to pick a venv.
+                { '<leader>vv', '<cmd>VenvSelect<cr>' },
+                -- Keymap to retrieve the venv from a cache (the one previously used for the same project directory).
+                { '<leader>vc', '<cmd>VenvSelectCached<cr>' },
+            }
+        },
     },
     -- automatically check for plugin updates
     checker = { enabled = false },
