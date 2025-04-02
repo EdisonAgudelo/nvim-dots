@@ -21,6 +21,14 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 vim.g.loaded_ruby_provider = 0
 
+local has_words_before = function()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  if col == 0 then
+    return false
+  end
+  local line = vim.api.nvim_get_current_line()
+  return line:sub(col, col):match("%s") == nil
+end
 
 -- Setup lazy.nvim
 require("lazy").setup({
@@ -131,7 +139,10 @@ require("lazy").setup({
             "williamboman/mason-lspconfig.nvim",
             dependecies = {"nvim-lspconfig", "saghen/blink.cmp"},
             config = function()
-                local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+                local capabilities = vim.lsp.protocol.make_client_capabilities()
+                capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities({}, false))
+
                 local custom_settings = {
                     ["pylsp"] = {
                         capabilities = capabilities,
@@ -200,32 +211,21 @@ require("lazy").setup({
             ---@type blink.cmp.Config
             opts = {
                 keymap = {
-                    preset = "default",
-                    ["<Tab>"] = {
-                        function(cmp)
-                            if cmp.snippet_active() then return cmp.accept()
-                            else return cmp.select_and_accept() end
-                        end,
-                        "snippet_forward",
-                        "fallback"
-                    },
+                    preset ="super-tab",
                 },
                 sources = {
-                    default = { "lsp", "path", "snippets", "buffer" , "markdown" },
+                    default = { "lsp", "path", "snippets", "buffer" },
                     providers = {
-                        markdown = {
-                            name = "RenderMarkdown",
-                            module = "render-markdown.integ.blink",
-                            fallbacks = { "lsp" },
-                        },
-                    },
+                        cmdline = {
+                            -- ignores cmdline completions when executing shell commands
+                            enabled = function()
+                                return vim.fn.getcmdtype() ~= ':' or not vim.fn.getcmdline():match("^[%%0-9,'<>%-]*!")
+                            end
+                        }
+                    }
                 },
                 completion = {
-                    menu = {
-                        auto_show = function(ctx)
-                            return ctx.mode ~= "cmdline" or not vim.tbl_contains({ "/", "?" }, vim.fn.getcmdtype())
-                        end,
-                    },
+                    menu = { enabled = true},
                     list = {
                         selection = {auto_insert = true, preselect = false}
                     },
@@ -298,6 +298,11 @@ require("lazy").setup({
             ---@module "render-markdown"
             ---@type render.md.UserConfig
             opts = {},
+            config = function()
+                require('render-markdown').setup({
+                    completions = { blink = { enabled = true } },
+                })
+            end,
         },
         {
             "jghauser/follow-md-links.nvim",
@@ -416,11 +421,23 @@ require("lazy").setup({
                 -- auto_refresh = false
             },
             event = 'VeryLazy', -- Optional: needed only if you want to type `:VenvSelect` without a keymapping
+
             keys = {
                 -- Keymap to open VenvSelector to pick a venv.
-                { '<leader>vv', '<cmd>VenvSelect<cr>' },
+                { '<leader>vv', '<cmd>VenvSelect<cr>', desc = "Select venv" },
                 -- Keymap to retrieve the venv from a cache (the one previously used for the same project directory).
-                { '<leader>vc', '<cmd>VenvSelectCached<cr>' },
+                { '<leader>vc', '<cmd>VenvSelectCached<cr>', desc = "Select venv cached" },
+            }
+        },
+        {
+            "3rd/image.nvim",
+            opts = {
+                max_width = 100, -- tweak to preference
+                max_height = 12, -- ^
+                max_height_window_percentage = math.huge, -- this is necessary for a good experience
+                max_width_window_percentage = math.huge,
+                window_overlap_clear_enabled = true,
+                window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
             }
         },
     },
