@@ -461,6 +461,7 @@ require("lazy").setup({
                 max_height_window_percentage = 50,
                 kitty_method = "normal",
             },
+            ft = "markdown"
         },
         {
             "aznhe21/actions-preview.nvim",
@@ -516,6 +517,66 @@ require("lazy").setup({
                     provider_selector = function (bufnr, filetype, buftype)
                         return { "lsp", "indent" }
                     end
+                })
+            end
+        },
+        {
+            "mfussenegger/nvim-dap",
+            keys = {
+                {"<leader>b"},
+            },
+            config = function ()
+                local dap = require("dap")
+                vim.keymap.set('n', '<F4>', function()  dap.run_to_cursor() end, {desc = "Debug run to"})
+                vim.keymap.set('n', '<F5>', function()  dap.continue() end, {desc = "Debug continue"})
+                vim.keymap.set('n', '<F10>', function() dap.step_over() end, {desc = "Debug step over"})
+                vim.keymap.set('n', '<F11>', function() dap.step_into() end, {desc = "Debug step into"})
+                vim.keymap.set('n', '<F12>', function() dap.step_out() end, {desc = "Debug step out"})
+                vim.keymap.set('n', '<leader>b', function() dap.toggle_breakpoint() end, { desc = "Toggle breakpoint"})
+                vim.keymap.set('n', '<leader>dr', function() dap.repl.open() end, { desc = "Debug Evaluate expression"})
+                vim.keymap.set({'n', 'v'}, '<leader>dh', function()  require('dap.ui.widgets').hover() end, { desc = "Debug show value"})
+
+            end
+        },
+        {
+            "rcarriga/nvim-dap-ui",
+            dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
+            keys = {
+                {"<leader>b"},
+            },
+            config = function ()
+                local dap, dapui = require("dap"), require("dapui")
+                dap.listeners.before.attach.dapui_config = function()
+                    dapui.open()
+                end
+                dap.listeners.before.launch.dapui_config = function()
+                    dapui.open()
+                end
+                dap.listeners.before.event_terminated.dapui_config = function()
+                    dapui.close()
+                end
+                dap.listeners.before.event_exited.dapui_config = function()
+                    dapui.close()
+                end
+                vim.fn.sign_define("DapBreakpoint", {text = "🔴", texthl = "", linehl="", numhl=""})
+                vim.fn.sign_define("DapStopped", {text = "🟢", texthl = "", linehl="", numhl=""})
+                dapui.setup()
+            end
+        },
+        {
+            "jay-babu/mason-nvim-dap.nvim",
+            dependencies = {
+                "mfussenegger/nvim-dap",
+                "williamboman/mason.nvim",
+            },
+            keys = {
+                {"<leader>b"},
+            },
+            config = function ()
+                require("mason-nvim-dap").setup({
+                    ensure_installed = {},
+                    automatic_installation = false,
+                    handlers = {},
                 })
             end
         }
