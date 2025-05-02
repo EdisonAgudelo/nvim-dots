@@ -125,6 +125,8 @@ require("lazy").setup({
             keys = {
                 {"gD", "<cmd>lua vim.lsp.buf.declaration()<CR>",  desc = "Goto Declaration"},
                 {"gd", "<cmd>lua vim.lsp.buf.definition()<CR>",  desc = "Goto Definition"},
+                {"grr", "<cmd>lua vim.lsp.buf.references()<CR>",  desc = "Show References"},
+                {"grn", "<cmd>lua vim.lsp.buf.rename()<CR>",  desc = "Rename Symbol"},
             },
         },
         {
