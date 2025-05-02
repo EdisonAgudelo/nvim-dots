@@ -12,8 +12,13 @@ PATH=\$PATH:/opt/nvim-linux-x86_64/bin
 EOF
 
 #Instal some dependecies
-sudo apt-get install -y fd-find ripgrep clang luajit libmagickwand-dev luarocks python3-venv python3-neovim npm
+sudo apt-get install -y xclip fd-find curl ripgrep clang luajit libmagickwand-dev luarocks python3-pip python3-venv python3-neovim npm
 sudo luarocks install magick
+
+#Install node
+curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+sudo bash nodesource_setup.sh
+sudo apt-get install nodejs -y
 
 #Install lazygit from official releases
 LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
