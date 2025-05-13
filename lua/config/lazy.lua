@@ -130,14 +130,14 @@ require("lazy").setup({
             },
         },
         {
-            "williamboman/mason.nvim",
+            "mason-org/mason.nvim",
             cmd = "Mason",
             config = function ()
                 require("mason").setup()
             end
         },
         {
-            "williamboman/mason-lspconfig.nvim",
+            "mason-org/mason-lspconfig.nvim",
             dependencies = {"nvim-lspconfig", "saghen/blink.cmp"},
             config = function()
 
@@ -152,8 +152,10 @@ require("lazy").setup({
                     lineFoldingOnly = true
                 }
 
-                local custom_settings = {
-                    ["pylsp"] = {
+                vim.lsp.config("*", {capabilities = capabilities})
+
+                vim.lsp.config(
+                    "pylsp", {
                         capabilities = capabilities,
                         settings = {
                             pylsp = {
@@ -170,13 +172,15 @@ require("lazy").setup({
                                 }
                             }
                         }
-                    },
-                    ["clangd"] = {
+                    })
+                vim.lsp.config(
+                    "clangd" , {
                         capabilities = capabilities,
                         -- do not auto include files
                         cmd = { "clangd", "-header-insertion=never" }
-                    },
-                    ["lua_ls"] = {
+                    })
+                vim.lsp.config(
+                    "lua_ls" , {
                         capabilities = capabilities,
                         -- get rid of vim symbol not defined
                         settings = {
@@ -197,22 +201,9 @@ require("lazy").setup({
                                 },
                             },
                         },
-                    }
-                }
+                    })
+
                 require("mason-lspconfig").setup()
-                require("mason-lspconfig").setup_handlers({
-                    function(server_name)
-                        local settings = custom_settings[server_name]
-                        if not settings then
-                            settings = {
-                                capabilities = capabilities,
-                            }
-                        end
-                        require("lspconfig")[server_name].setup(
-                            settings
-                        )
-                    end,
-                })
             end,
         },
         {
@@ -569,7 +560,7 @@ require("lazy").setup({
             "jay-babu/mason-nvim-dap.nvim",
             dependencies = {
                 "mfussenegger/nvim-dap",
-                "williamboman/mason.nvim",
+                "mason-org/mason.nvim",
             },
             keys = {
                 {"<leader>b"},

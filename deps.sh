@@ -12,7 +12,8 @@ PATH=\$PATH:/opt/nvim-linux-x86_64/bin
 EOF
 
 #Instal some dependecies
-sudo apt-get install -y xclip fd-find curl ripgrep clang luajit libmagickwand-dev luarocks python3-pip python3-venv python3-neovim npm
+sudo apt-get autoremove --purge npm neovim -y
+sudo apt-get install -y xclip fd-find curl ripgrep clang luajit libmagickwand-dev luarocks python3-pip python3-venv python3-neovim
 sudo luarocks install magick
 
 #Install node
